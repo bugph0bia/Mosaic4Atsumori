@@ -27,7 +27,7 @@ Mosaic4Atsumori
 v0.0.1
 
 ## ダウンロード
-[download](https://github.com/mat2umoto/Mosaic4Atsumori/releases/download/v0.0.1/Mosaic4Atsumori.zip)
+[こちら](https://github.com/mat2umoto/Mosaic4Atsumori/releases/download/v0.0.1/Mosaic4Atsumori.zip) から V0.0.1 をダウンロードできます。
 
 ## 開発環境
 Visual Studio 2017
