@@ -1,4 +1,4 @@
-# Mosaic4Atsumori
+Mosaic4Atsumori
 ===
 
 ![Software Version](http://img.shields.io/badge/Version-v0.0.1-green.svg?style=flat)
