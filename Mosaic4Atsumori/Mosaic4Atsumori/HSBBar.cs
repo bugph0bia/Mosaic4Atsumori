@@ -15,47 +15,45 @@ namespace Mosaic4Atsumori
         /// <summary>
         /// HBarStepの初期値
         /// </summary>
-        const int DEFAULT_HBAR_STEP = 30;
+        const int DEFAULT_HBAR_STEP_COUNT = 30;
         /// <summary>
         /// SBarStepの初期値
         /// </summary>
-        const int DEFAULT_SBAR_STEP = 15;
+        const int DEFAULT_SBAR_STEP_COUNT = 15;
         /// <summary>
         /// BBarStepの初期値
         /// </summary>
-        const int DEFAULT_BBAR_STEP = 15;
+        const int DEFAULT_BBAR_STEP_COUNT = 15;
 
         /// <summary>
         /// 色相バーの刻み数
         /// </summary>
-        public int HBarStep { set; get; }
+        public int HBarStepCount { set; get; }
         /// <summary>
         /// 彩度バーの刻み数
         /// </summary>
-        public int SBarStep { set; get; }
+        public int SBarStepCount { set; get; }
         /// <summary>
         /// 明度バーの刻み数
         /// </summary>
-        public int BBarStep { set; get; }
+        public int BBarStepCount { set; get; }
 
         /// <summary>
-        /// 描画色
+        /// 選択色
         /// </summary>
-        private Color _drawColor;
-        public Color DrawColor
+        private Color _selectedColor;
+        public Color SelectedColor
         {
             set
             {
-                _drawColor = value;
+                _selectedColor = value;
 
                 // バーを再描画
-                HBar.Invalidate();
-                SBar.Invalidate();
-                BBar.Invalidate();
+                Redraw();
             }
             get
             {
-                return _drawColor;
+                return _selectedColor;
             }
         }
 
@@ -111,10 +109,10 @@ namespace Mosaic4Atsumori
         {
             InitializeComponent();
 
-            DrawColor = Color.White;
-            HBarStep = DEFAULT_HBAR_STEP;
-            SBarStep = DEFAULT_SBAR_STEP;
-            BBarStep = DEFAULT_BBAR_STEP;
+            SelectedColor = Color.Empty;
+            HBarStepCount = DEFAULT_HBAR_STEP_COUNT;
+            SBarStepCount = DEFAULT_SBAR_STEP_COUNT;
+            BBarStepCount = DEFAULT_BBAR_STEP_COUNT;
         }
 
         /// <summary>
@@ -123,10 +121,15 @@ namespace Mosaic4Atsumori
         /// <returns></returns>
         public Color GetMarkerColor()
         {
-            // 描画色の色相を180度反転した色
-            return ColorFromHSB(DrawColor.GetHue() + 180.0, 1.0, 1.0);
+            // 補色かつ彩度と明度がMAXの値をマーカー色とする
+            return ColorUtil.FromHSB(SelectedColor.GetHue() + (ColorUtil.HMAX / 2.0F), ColorUtil.SMAX, ColorUtil.BMAX);
         }
 
+        /// <summary>
+        /// イベント：コントロールロード
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void HSBBar_Load(object sender, EventArgs e)
         {
         }
@@ -169,9 +172,7 @@ namespace Mosaic4Atsumori
         private void HSBBar_Paint(object sender, PaintEventArgs e)
         {
             // バーを再描画
-            HBar.Invalidate();
-            SBar.Invalidate();
-            BBar.Invalidate();
+            Redraw();
         }
 
         /// <summary>
@@ -181,13 +182,13 @@ namespace Mosaic4Atsumori
         {
             // 色配列を作成
             var colors = new List<Color>();
-            for (int i = 0; i < HBarStep; i++)
+            for (int i = 0; i < HBarStepCount; i++)
             {
-                colors.Add(ColorFromHSB(360.0 / HBarStep * i, 1.0, 1.0));
+                colors.Add(ColorUtil.FromHSB(ColorUtil.HMAX / HBarStepCount * i, ColorUtil.SMAX, ColorUtil.BMAX));
             }
 
             // 描画
-            DrawBar(g, HBar, colors, (int)(DrawColor.GetHue() / 360.0 * HBarStep));
+            DrawBar(g, HBar, colors, (int)(SelectedColor.GetHue() / ColorUtil.HMAX * HBarStepCount));
         }
 
         /// <summary>
@@ -197,13 +198,13 @@ namespace Mosaic4Atsumori
         {
             // 色配列を作成
             var colors = new List<Color>();
-            for (int i = 0; i < SBarStep; i++)
+            for (int i = 0; i < SBarStepCount; i++)
             {
-                colors.Add(ColorFromHSB(DrawColor.GetHue(), (double)i / SBarStep, DrawColor.GetBrightness()));
+                colors.Add(ColorUtil.FromHSB(SelectedColor.GetHue(), (float)i / SBarStepCount, SelectedColor.GetBrightness()));
             }
 
             // 描画
-            DrawBar(g, SBar, colors, (int)(DrawColor.GetSaturation() * SBarStep));
+            DrawBar(g, SBar, colors, (int)(SelectedColor.GetSaturation() * SBarStepCount));
         }
 
         /// <summary>
@@ -213,13 +214,13 @@ namespace Mosaic4Atsumori
         {
             // 色配列を作成
             var colors = new List<Color>();
-            for (int i = 0; i < BBarStep; i++)
+            for (int i = 0; i < BBarStepCount; i++)
             {
-                colors.Add(ColorFromHSB(DrawColor.GetHue(), DrawColor.GetSaturation(), (double)i / BBarStep));
+                colors.Add(ColorUtil.FromHSB(SelectedColor.GetHue(), SelectedColor.GetSaturation(), (float)i / BBarStepCount));
             }
 
             // 描画
-            DrawBar(g, BBar, colors, (int)(DrawColor.GetBrightness() * BBarStep));
+            DrawBar(g, BBar, colors, (int)(SelectedColor.GetBrightness() * BBarStepCount));
         }
 
         /// <summary>
@@ -228,15 +229,15 @@ namespace Mosaic4Atsumori
         /// <param name="g"></param>
         /// <param name="bar"></param>
         /// <param name="colors"></param>
-        /// <param name="Selected"></param>
-        private void DrawBar(Graphics g, PictureBox bar, List<Color> colors, int Selected)
+        /// <param name="selected"></param>
+        private void DrawBar(Graphics g, PictureBox bar, List<Color> colors, int selected)
         {
             int x = 0;
             int y = 0;
             int h = bar.Height;
 
             // 選択値がMAXの場合は右端を選択するように補正する
-            if (Selected == colors.Count) Selected -= 1;
+            if (selected == colors.Count) selected -= 1;
 
             // ステップごとに描画
             for (int i = 0; i < colors.Count; i++)
@@ -245,8 +246,9 @@ namespace Mosaic4Atsumori
                 g.FillRectangle(new SolidBrush(colors[i]), x, y, w, h);
 
                 // 描画色のインデックスなら
-                if(i == Selected)
+                if(i == selected)
                 {
+                    // 枠線を描画
                     g.DrawRectangle(new Pen(GetMarkerColor(), 2), x, y, w - 2, h - 2);
                 }
 
@@ -255,69 +257,14 @@ namespace Mosaic4Atsumori
         }
 
         /// <summary>
-        /// HSBからColorを作成
+        /// 再描画
         /// </summary>
-        /// <param name="h"></param>
-        /// <param name="s"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        private Color ColorFromHSB(double h, double s, double b)
+        private void Redraw()
         {
-            // H を 0.0 ～ 359.0 とする
-            h = h % 360.0;
-
-            // 計算用の値
-            double h2 = h / 60 % 1.0;
-            double calA = b * 255.0;
-            double calB = b * (1.0 - s) * 255.0;
-            double calC = b * (1.0 - s * h2) * 255.0;
-            double calD = b * (1.0 - s * (1.0 - h2)) * 255.0;
-
-            int R, G, B;
-            if(s == 0)
-            {
-                R = (int)calA;
-                G = (int)calA;
-                B = (int)calA;
-            }
-            else if (h < 60)
-            {
-                R = (int)calA;
-                G = (int)calD;
-                B = (int)calB;
-            }
-            else if (h < 120)
-            {
-                R = (int)calC;
-                G = (int)calA;
-                B = (int)calB;
-            }
-            else if (h < 180)
-            {
-                R = (int)calB;
-                G = (int)calA;
-                B = (int)calD;
-            }
-            else if (h < 240)
-            {
-                R = (int)calB;
-                G = (int)calC;
-                B = (int)calA;
-            }
-            else if (h < 300)
-            {
-                R = (int)calD;
-                G = (int)calB;
-                B = (int)calA;
-            }
-            else
-            {
-                R = (int)calA;
-                G = (int)calB;
-                B = (int)calC;
-            }
-
-            return Color.FromArgb(R, G, B);
+            // 3つのバーを再描画
+            HBar.Invalidate();
+            SBar.Invalidate();
+            BBar.Invalidate();
         }
     }
 }

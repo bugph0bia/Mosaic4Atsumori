@@ -77,10 +77,7 @@ namespace Mosaic4Atsumori
         private void ButtonLoad_Click(object sender, EventArgs e)
         {
             // ファイル選択ダイアログを表示
-            if(DialogImageLoad.ShowDialog() != DialogResult.OK)
-            {
-                return;
-            }
+            if (DialogImageLoad.ShowDialog() != DialogResult.OK) return;
 
             // 画像ファイルを読み込み
             LoadImage(DialogImageLoad.FileName);
@@ -121,13 +118,9 @@ namespace Mosaic4Atsumori
         {
             // エクスプローラからのファイルドラッグの場合は許可する
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
                 e.Effect = DragDropEffects.All;
-            }
             else
-            {
                 e.Effect = DragDropEffects.None;
-            }
         }
 
         private void FormMain_DragDrop(object sender, DragEventArgs e)
@@ -152,17 +145,17 @@ namespace Mosaic4Atsumori
             // チェックONにされた場合
             if (cbCurrent.CheckState == CheckState.Checked)
             {
+                // 操作されていないチェックボックスを全てOFFにする
                 foreach (var cb in CheckBoxPallets)
                 {
                     if (cb.Name != cbCurrent.Name)
                     {
-                        // 操作されていないチェックボックスを全てOFFにする
                         cb.CheckState = CheckState.Unchecked;
                     }
                 }
 
                 // パレット領域を更新
-                HSBBarPallet.DrawColor = cbCurrent.BackColor;
+                HSBBarPallet.SelectedColor = cbCurrent.BackColor;
             }
 
             // ピクチャーボックスの描画イベント発行
