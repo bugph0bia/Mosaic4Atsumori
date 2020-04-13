@@ -242,15 +242,14 @@
             this.HSBBarPallet.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.HSBBarPallet.BBarLabel = "あかるさ";
-            this.HSBBarPallet.BBarStep = 15;
+            this.HSBBarPallet.BBarStepCount = 15;
             this.HSBBarPallet.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.HSBBarPallet.DrawColor = System.Drawing.Color.White;
             this.HSBBarPallet.HBarLabel = "いろあい";
-            this.HSBBarPallet.HBarStep = 30;
+            this.HSBBarPallet.HBarStepCount = 30;
             this.HSBBarPallet.Location = new System.Drawing.Point(350, 12);
             this.HSBBarPallet.Name = "HSBBarPallet";
             this.HSBBarPallet.SBarLabel = "あざやかさ";
-            this.HSBBarPallet.SBarStep = 15;
+            this.HSBBarPallet.SBarStepCount = 15;
             this.HSBBarPallet.Size = new System.Drawing.Size(244, 77);
             this.HSBBarPallet.TabIndex = 18;
             // 
