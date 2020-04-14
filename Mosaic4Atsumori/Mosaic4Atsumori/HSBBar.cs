@@ -10,8 +10,14 @@ using System.Windows.Forms;
 
 namespace Mosaic4Atsumori
 {
+    /// <summary>
+    /// HSBバーコントロールクラス
+    /// </summary>
     public partial class HSBBar : UserControl
     {
+
+        #region 定数
+
         /// <summary>
         /// HBarStepの初期値
         /// </summary>
@@ -25,16 +31,22 @@ namespace Mosaic4Atsumori
         /// </summary>
         const int DEFAULT_BBAR_STEP_COUNT = 15;
 
+        #endregion
+
+        #region プロパティ
+
         /// <summary>
-        /// 色相バーの刻み数
+        /// 色相バーのステップの数
         /// </summary>
         public int HBarStepCount { set; get; }
+
         /// <summary>
-        /// 彩度バーの刻み数
+        /// 彩度バーのステップの数
         /// </summary>
         public int SBarStepCount { set; get; }
+
         /// <summary>
-        /// 明度バーの刻み数
+        /// 明度バーのステップの数
         /// </summary>
         public int BBarStepCount { set; get; }
 
@@ -47,7 +59,6 @@ namespace Mosaic4Atsumori
             set
             {
                 _selectedColor = value;
-
                 // バーを再描画
                 Redraw();
             }
@@ -102,28 +113,9 @@ namespace Mosaic4Atsumori
             }
         }
 
-        /// <summary>
-        /// コンストラクタ
-        /// </summary>
-        public HSBBar()
-        {
-            InitializeComponent();
+        #endregion
 
-            SelectedColor = Color.Empty;
-            HBarStepCount = DEFAULT_HBAR_STEP_COUNT;
-            SBarStepCount = DEFAULT_SBAR_STEP_COUNT;
-            BBarStepCount = DEFAULT_BBAR_STEP_COUNT;
-        }
-
-        /// <summary>
-        /// マーカー色を取得
-        /// </summary>
-        /// <returns></returns>
-        public Color GetMarkerColor()
-        {
-            // 補色かつ彩度と明度がMAXの値をマーカー色とする
-            return ColorUtil.FromHSB(SelectedColor.GetHue() + (ColorUtil.HMAX / 2.0F), ColorUtil.SMAX, ColorUtil.BMAX);
-        }
+        #region イベント
 
         /// <summary>
         /// イベント：コントロールロード
@@ -175,9 +167,38 @@ namespace Mosaic4Atsumori
             Redraw();
         }
 
+        #endregion
+
+        #region メソッド
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public HSBBar()
+        {
+            InitializeComponent();
+
+            // メンバを初期化
+            SelectedColor = Color.Empty;
+            HBarStepCount = DEFAULT_HBAR_STEP_COUNT;
+            SBarStepCount = DEFAULT_SBAR_STEP_COUNT;
+            BBarStepCount = DEFAULT_BBAR_STEP_COUNT;
+        }
+
+        /// <summary>
+        /// マーカー色を取得
+        /// </summary>
+        /// <returns>色データ</returns>
+        public Color GetMarkerColor()
+        {
+            // 補色をマーカー色とする
+            return ColorUtil.GetComplementaryColor(SelectedColor);
+        }
+
         /// <summary>
         /// 色相バー描画
         /// </summary>
+        /// <param name="g">グラフィックオブジェクト</param>
         private void DrawHBar(Graphics g)
         {
             // 色配列を作成
@@ -188,12 +209,13 @@ namespace Mosaic4Atsumori
             }
 
             // 描画
-            DrawBar(g, HBar, colors, (int)(SelectedColor.GetHue() / ColorUtil.HMAX * HBarStepCount));
+            DrawBar(g, HBar, colors, ColorUtil.GetHueStep(SelectedColor, HBarStepCount));
         }
 
         /// <summary>
         /// 彩度バー描画
         /// </summary>
+        /// <param name="g">グラフィックオブジェクト</param>
         private void DrawSBar(Graphics g)
         {
             // 色配列を作成
@@ -204,12 +226,13 @@ namespace Mosaic4Atsumori
             }
 
             // 描画
-            DrawBar(g, SBar, colors, (int)(SelectedColor.GetSaturation() * SBarStepCount));
+            DrawBar(g, SBar, colors, ColorUtil.GetSaturationStep(SelectedColor, SBarStepCount));
         }
 
         /// <summary>
         /// 明度バー描画
         /// </summary>
+        /// <param name="g">グラフィックオブジェクト</param>
         private void DrawBBar(Graphics g)
         {
             // 色配列を作成
@@ -220,24 +243,21 @@ namespace Mosaic4Atsumori
             }
 
             // 描画
-            DrawBar(g, BBar, colors, (int)(SelectedColor.GetBrightness() * BBarStepCount));
+            DrawBar(g, BBar, colors, ColorUtil.GetBrightnessStep(SelectedColor, BBarStepCount));
         }
 
         /// <summary>
         /// バー描画
         /// </summary>
-        /// <param name="g"></param>
-        /// <param name="bar"></param>
-        /// <param name="colors"></param>
-        /// <param name="selected"></param>
-        private void DrawBar(Graphics g, PictureBox bar, List<Color> colors, int selected)
+        /// <param name="g">グラフィックオブジェクト</param>
+        /// <param name="bar">対象のバー（ピクチャーボックス）</param>
+        /// <param name="colors">描画色コレクション（要素数=選択色の対象のHSB値のステップ総数）</param>
+        /// <param name="step">選択色の対象のHSB値のステップ値</param>
+        private void DrawBar(Graphics g, PictureBox bar, List<Color> colors, int step)
         {
             int x = 0;
             int y = 0;
             int h = bar.Height;
-
-            // 選択値がMAXの場合は右端を選択するように補正する
-            if (selected == colors.Count) selected -= 1;
 
             // ステップごとに描画
             for (int i = 0; i < colors.Count; i++)
@@ -245,8 +265,8 @@ namespace Mosaic4Atsumori
                 int w = (int)(bar.Width * ((double)(i + 1) / colors.Count)) - x;
                 g.FillRectangle(new SolidBrush(colors[i]), x, y, w, h);
 
-                // 描画色のインデックスなら
-                if(i == selected)
+                // 選択色のステップ値なら
+                if(i == step)
                 {
                     // 枠線を描画
                     g.DrawRectangle(new Pen(GetMarkerColor(), 2), x, y, w - 2, h - 2);
@@ -266,5 +286,7 @@ namespace Mosaic4Atsumori
             SBar.Invalidate();
             BBar.Invalidate();
         }
+
+        #endregion
     }
 }

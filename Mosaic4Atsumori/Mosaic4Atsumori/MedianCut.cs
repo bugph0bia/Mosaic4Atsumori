@@ -8,10 +8,17 @@ using System.Drawing;
 namespace Mosaic4Atsumori
 {
     /// <summary>
+    /// 軸色の列挙型
+    /// </summary>
+    enum AxisColor { R, G, B }
+
+    /// <summary>
     /// ピクセル情報クラス
     /// </summary>
     struct Pixel
     {
+        #region プロパティ
+
         /// <summary>
         /// RGB値
         /// </summary>
@@ -21,24 +28,38 @@ namespace Mosaic4Atsumori
         /// </summary>
         public Point Position { set; get; }
 
+        #endregion
+
+        #region メソッド
+
         /// <summary>
-        /// 軸色を返す
+        /// 軸色の値を返す
         /// </summary>
-        /// <param name="axis"></param>
-        /// <returns></returns>
-        public int GetAxisColor(Char axis)
+        /// <param name="axis">軸</param>
+        /// <returns>軸色の値</returns>
+        public byte GetAxisColor(AxisColor axis)
         {
-            if (axis == 'G') return Color.G;
-            if (axis == 'B') return Color.B;
-            return Color.R;
+            switch (axis)
+            {
+                case AxisColor.R:
+                default:
+                    return Color.R;
+                case AxisColor.G:
+                    return Color.G;
+                case AxisColor.B:
+                    return Color.B;
+            }
+
+            #endregion
         }
     }
-
     /// <summary>
     /// キューブ情報クラス
     /// </summary>
     class Cube
     {
+        #region プロパティ
+
         /// <summary>
         /// ピクセル情報コレクション(軸色が昇順となるようにソート済み)
         /// </summary>
@@ -47,17 +68,21 @@ namespace Mosaic4Atsumori
         /// <summary>
         /// 軸色（'R' 'G' 'B'）
         /// </summary>
-        public Char AxisColor { set; get; }
+        public AxisColor Axis { set; get; }
 
         /// <summary>
         /// 代表色
         /// </summary>
         public Color RepColor { set; get; }
 
+        #endregion
+
+        #region メソッド
+
         /// <summary>
         /// コンストラクタ：ビットマップから生成
         /// </summary>
-        /// <param name="bmp"></param>
+        /// <param name="bmp">元データとするビットマップ</param>
         public Cube(Bitmap bmp)
         {
             // ビットマップからピクセル配列を抽出
@@ -81,13 +106,17 @@ namespace Mosaic4Atsumori
         /// <summary>
         /// コンストラクタ：ピクセル配列から生成
         /// </summary>
-        /// <param name="pixels">ピクセル配列</param>
+        /// <param name="pixels">元データとするピクセル配列</param>
         public Cube(List<Pixel> pixels)
         {
             // 初期化
             Initialize(pixels);
         }
 
+        /// <summary>
+        /// 別のCubeオブジェクトを連結
+        /// </summary>
+        /// <param name="other">別のCubeオブジェクト</param>
         public void Add(Cube other)
         {
             // ピクセルを連結
@@ -99,32 +128,32 @@ namespace Mosaic4Atsumori
         /// <summary>
         /// 初期化
         /// </summary>
-        /// <param name="pixels">ピクセル配列</param>
+        /// <param name="pixels">元データとするピクセル配列</param>
         private void Initialize(List<Pixel> pixels = null)
         {
-            // null指定されたら保持しているピクセル情報を再利用する
-            if(pixels != null) Pixels = pixels;
+            // 元データが指定されていればピクセル情報を更新する
+            if (pixels != null) Pixels = pixels;
 
             //////// 軸色を決定 ////////
 
             // RGBそれぞれの軸長（最大値 - 最小値)を算出
-            double lenR = CalcAxisLength('R');
-            double lenG = CalcAxisLength('G');
-            double lenB = CalcAxisLength('B');
+            double lenR = CalcAxisLength(AxisColor.R);
+            double lenG = CalcAxisLength(AxisColor.G);
+            double lenB = CalcAxisLength(AxisColor.B);
 
             // RGは人間の目で識別しやすいので係数を掛けて軸色として採用され易くする
             lenR *= 1.2;
             lenG *= 1.2;
 
             // 規定を R とする
-            AxisColor = 'R';
-            if (lenG > lenR && lenG > lenB) AxisColor = 'G';
-            if (lenB > lenR && lenB > lenG) AxisColor = 'B';
+            Axis = AxisColor.R;
+            if (lenG > lenR && lenG > lenB) Axis = AxisColor.G;
+            if (lenB > lenR && lenB > lenG) Axis = AxisColor.B;
 
             //////// ピクセル配列を確定 ///////
 
             // 軸色の昇順でソート
-            Pixels.Sort((l, r) => l.GetAxisColor(AxisColor) - r.GetAxisColor(AxisColor));
+            Pixels.Sort((l, r) => l.GetAxisColor(Axis) - r.GetAxisColor(Axis));
 
             //////// 代表色を作成 ////////
 
@@ -136,17 +165,25 @@ namespace Mosaic4Atsumori
         }
 
         /// <summary>
-        /// 指定した軸の長さ（最大値 - 最小値）を計算
+        /// 指定した軸色の長さ（最大値 - 最小値）を計算
         /// </summary>
-        /// <param name="axis"></param>
+        /// <param name="axis">軸色</param>
         /// <returns></returns>
-        public int CalcAxisLength(Char axis)
+        public int CalcAxisLength(AxisColor axis)
         {
-            if (axis == 'R') return Pixels.Max(v => v.Color.R) - Pixels.Min(v => v.Color.R);
-            if (axis == 'G') return Pixels.Max(v => v.Color.G) - Pixels.Min(v => v.Color.G);
-            if (axis == 'B') return Pixels.Max(v => v.Color.B) - Pixels.Min(v => v.Color.B);
+            switch (axis)
+            {
+                case AxisColor.R:
+                    return Pixels.Max(v => v.Color.R) - Pixels.Min(v => v.Color.R);
+                case AxisColor.G:
+                    return Pixels.Max(v => v.Color.G) - Pixels.Min(v => v.Color.G);
+                case AxisColor.B:
+                    return Pixels.Max(v => v.Color.B) - Pixels.Min(v => v.Color.B);
+            }
             return 0;
         }
+
+        #endregion
     }
 
     /// <summary>
@@ -154,6 +191,8 @@ namespace Mosaic4Atsumori
     /// </summary>
     class MedianCut
     {
+        #region プロパティ
+
         /// <summary>
         /// キューブ情報コレクション
         /// </summary>
@@ -162,35 +201,47 @@ namespace Mosaic4Atsumori
         /// <summary>
         /// 画像
         /// </summary>
-        public Bitmap Bitmap { set; get; }
+        public Bitmap BitmapData { set; get; }
 
         /// <summary>
         /// 分割数
         /// </summary>
         public int CutCount { set; get; }
 
-        public MedianCut(Bitmap bmp, int count)
+        #endregion
+
+        #region メソッド
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="bmp">元データとするビットマップ</param>
+        /// <param name="count">分割数</param>
+        public MedianCut(Bitmap bmp, int cutCount)
         {
-            Bitmap = bmp;
-            CutCount = count;
+            BitmapData = bmp;
+            CutCount = cutCount;
         }
 
         /// <summary>
         /// 実行
         /// </summary>
-        public void Run()
+        /// <param name="HStepCount">色相のステップ総数</param>
+        /// <param name="SStepCount">彩度のステップ総数</param>
+        /// <param name="BStepCount">明度のステップ総数</param>
+        public void Run(int HStepCount, int SStepCount, int BStepCount)
         {
             // 元画像から最初のキューブを作成
             Cubes = new List<Cube>();
-            Cubes.Add(new Cube(Bitmap));
+            Cubes.Add(new Cube(BitmapData));
 
             // 分割数に達するまで繰り返す
-            while(Cubes.Count < CutCount)
+            while (Cubes.Count < CutCount)
             {
                 // 末尾のキューブを2分割する
                 Cube maxCube = Cubes[Cubes.Count - 1];
                 // これ以上分割不可
-                if (maxCube.Pixels.Count == 1) break;
+                if (maxCube.Pixels.Count <= 1) break;
 
                 // 分割点（分割後の1つ目の配列の要素数）
                 int sp = (maxCube.Pixels.Count + 1) / 2 - 1;
@@ -211,16 +262,16 @@ namespace Mosaic4Atsumori
                 // キューブ配列を面積（ピクセル数）でソート
                 //Cubes.Sort((l, r) => l.Pixels.Count - r.Pixels.Count);
                 // キューブ配列を軸長（最も分散が大きい色の最大値-最小値）でソート
-                Cubes.Sort((l, r) => l.CalcAxisLength(l.AxisColor) - r.CalcAxisLength(r.AxisColor));
+                Cubes.Sort((l, r) => l.CalcAxisLength(l.Axis) - r.CalcAxisLength(r.Axis));
             }
 
-            // 同じ代表色を持つキューブはマージする
+            // HSB値の全ステップ値が一致する代表色を持つキューブはマージする
             // ※リストの削除を伴うため降順ソート
             for (int i = Cubes.Count - 1; i >= 0; i--)
             {
                 for (int j = i - 1; j >= 0; j--)
                 {
-                    if(Cubes[i].RepColor == Cubes[j].RepColor)
+                    if (ColorUtil.EqualHSBSteps(Cubes[i].RepColor, Cubes[j].RepColor, HStepCount, SStepCount, BStepCount))
                     {
                         // i番目をj番目に連結して削除
                         Cubes[j].Add(Cubes[i]);
@@ -235,11 +286,13 @@ namespace Mosaic4Atsumori
             // 全キューブの代表色を使用して画像の全ピクセルを更新
             foreach (var c in Cubes)
             {
-                foreach(var p in c.Pixels)
+                foreach (var p in c.Pixels)
                 {
-                    Bitmap.SetPixel(p.Position.X, p.Position.Y, c.RepColor);
+                    BitmapData.SetPixel(p.Position.X, p.Position.Y, c.RepColor);
                 }
             }
         }
+
+        #endregion
     }
 }

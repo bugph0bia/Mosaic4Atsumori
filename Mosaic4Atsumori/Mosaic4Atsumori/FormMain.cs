@@ -12,19 +12,55 @@ using System.Windows.Forms;
 
 namespace Mosaic4Atsumori
 {
+    /// <summary>
+    /// メインフォーム
+    /// </summary>
     public partial class FormMain : Form
     {
-        // 定数
+        #region 定数
+
+        /// <summary>
+        /// 画像の幅
+        /// </summary>
         const int IMAGE_WIDTH = 32;
+
+        /// <summary>
+        /// 画像の高さ
+        /// </summary>
         const int IMAGE_HEIGHT = 32;
+
+        /// <summary>
+        /// 画像の使用する色数
+        /// </summary>
         const int COLOR_MAX = 15;
+
+        /// <summary>
+        /// 色相のステップ総数
+        /// </summary>
+        const int HSTEP_COUNT = 30;
+
+        /// <summary>
+        /// 彩度のステップ総数
+        /// </summary>
+        const int SSTEP_COUNT = 15;
+
+        /// <summary>
+        /// 明度のステップ総数
+        /// </summary>
+        const int BSTEP_COUNT = 15;
+
+        #endregion
+
+        #region プロパティ
 
         /// <summary>
         /// チェックボックス配列
         /// </summary>
-        public CheckBox[] CheckBoxPallets;
+        public CheckBox[] CheckBoxPallets { set; get; }
 
-        // 表示用画像
+        /// <summary>
+        /// 表示用画像生成オブジェクト
+        /// </summary>
         DrawingImage Drawer { set; get; }
 
         /// <summary>
@@ -32,10 +68,9 @@ namespace Mosaic4Atsumori
         /// </summary>
         MedianCut Converter { set; get; }
 
-        public FormMain()
-        {
-            InitializeComponent();
-        }
+        #endregion
+
+        #region イベント
 
         /// <summary>
         /// イベント：フォームロード
@@ -67,6 +102,14 @@ namespace Mosaic4Atsumori
             CheckBoxPallets[12] = CheckBoxPallet12;
             CheckBoxPallets[13] = CheckBoxPallet13;
             CheckBoxPallets[14] = CheckBoxPallet14;
+
+            // パレット詳細
+            HSBBarPallet.HBarLabel = "いろあい";
+            HSBBarPallet.HBarStepCount = HSTEP_COUNT;
+            HSBBarPallet.SBarLabel = "あざやかさ";
+            HSBBarPallet.SBarStepCount = SSTEP_COUNT;
+            HSBBarPallet.BBarLabel = "あかるさ";
+            HSBBarPallet.BBarStepCount = BSTEP_COUNT;
         }
 
         /// <summary>
@@ -85,17 +128,6 @@ namespace Mosaic4Atsumori
             // 選択したフォルダを次回に使用
             DialogImageLoad.InitialDirectory = Path.GetDirectoryName(DialogImageLoad.FileName);
             DialogImageLoad.FileName = "";
-        }
-
-        /// <summary>
-        /// イベント：滑らかチェック変更
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CheckBoxSmooth_CheckedChanged(object sender, EventArgs e)
-        {
-            // ピクチャーボックスの描画イベント発行
-            PictureBoxDraw.Invalidate();
         }
 
         /// <summary>
@@ -123,6 +155,11 @@ namespace Mosaic4Atsumori
                 e.Effect = DragDropEffects.None;
         }
 
+        /// <summary>
+        /// イベント：ドロップ
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FormMain_DragDrop(object sender, DragEventArgs e)
         {
             // ドロップされたファイルパスを取得
@@ -154,7 +191,7 @@ namespace Mosaic4Atsumori
                     }
                 }
 
-                // パレット領域を更新
+                // パレット詳細を更新
                 HSBBarPallet.SelectedColor = cbCurrent.BackColor;
             }
 
@@ -184,8 +221,11 @@ namespace Mosaic4Atsumori
                     i++;
                 }
 
-                // ハイライト色を設定
-                Drawer.HighLightColor = HSBBarPallet.GetMarkerColor();
+                // ハイライト色を設定（選択中パレットの補色）
+                if(Drawer.SelectedPallet >= 0 && Drawer.SelectedPallet < Converter.Cubes.Count)
+                {
+                    Drawer.HighLightColor = ColorUtil.GetComplementaryColor(Converter.Cubes[Drawer.SelectedPallet].RepColor);
+                }
 
                 // 画像を表示する
                 Bitmap bmp = Drawer.Execute(PictureBoxDraw.Size);
@@ -198,10 +238,22 @@ namespace Mosaic4Atsumori
             }
         }
 
+        #endregion
+
+        #region メソッド
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public FormMain()
+        {
+            InitializeComponent();
+        }
+
         /// <summary>
         /// 画像ファイルの読み込み
         /// </summary>
-        /// <param name="strFilePath"></param>
+        /// <param name="strFilePath">ファイルパス</param>
         private void LoadImage(string strFilePath)
         {
             // 選択されたファイルパスをラベルに表示
@@ -229,7 +281,7 @@ namespace Mosaic4Atsumori
         /// <summary>
         /// 表示用画像作成
         /// </summary>
-        /// <param name="imgOrg"></param>
+        /// <param name="imgOrg">変換前画像データ</param>
         /// <returns></returns>
         private void MakeDrawingImage(Image imgOrg)
         {
@@ -245,7 +297,7 @@ namespace Mosaic4Atsumori
 
             // 画像メディアンカットによる減色(15色)
             Converter = new MedianCut(bmpMosaic, COLOR_MAX);
-            Converter.Run();
+            Converter.Run(HSTEP_COUNT, SSTEP_COUNT, BSTEP_COUNT);
 
             // 表示用画像用オブジェクトを生成
             Drawer = new DrawingImage(Converter);
@@ -263,5 +315,7 @@ namespace Mosaic4Atsumori
                 i++;
             }
         }
+
+        #endregion
     }
 }

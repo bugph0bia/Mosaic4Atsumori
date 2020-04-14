@@ -250,6 +250,7 @@
             this.HSBBarPallet.Name = "HSBBarPallet";
             this.HSBBarPallet.SBarLabel = "あざやかさ";
             this.HSBBarPallet.SBarStepCount = 15;
+            this.HSBBarPallet.SelectedColor = System.Drawing.Color.Empty;
             this.HSBBarPallet.Size = new System.Drawing.Size(244, 77);
             this.HSBBarPallet.TabIndex = 18;
             // 
@@ -280,7 +281,7 @@
             this.Controls.Add(this.ButtonLoad);
             this.MaximizeBox = false;
             this.Name = "FormMain";
-            this.Text = "あつ森 マイデザイン作成 V0.0.1";
+            this.Text = "あつ森 マイデザイン作成補助ツール Ver 0.0.2";
             this.Load += new System.EventHandler(this.FormMain_Load);
             this.ResizeEnd += new System.EventHandler(this.FormMain_ResizeEnd);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.FormMain_DragDrop);
