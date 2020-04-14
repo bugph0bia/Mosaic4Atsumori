@@ -8,10 +8,12 @@ using System.Drawing;
 namespace Mosaic4Atsumori
 {
     /// <summary>
-    /// Colorクラス拡張用
+    /// Color拡張用クラス
     /// </summary>
     static class ColorUtil
     {
+        #region 定数
+
         /// <summary>
         /// RGB値の最大値
         /// </summary>
@@ -32,13 +34,17 @@ namespace Mosaic4Atsumori
         /// </summary>
         public const float BMAX = 1.0F;
 
+        #endregion
+
+        #region メソッド
+
         /// <summary>
         /// HSBからColorを生成
         /// </summary>
         /// <param name="h">色相</param>
         /// <param name="s">彩度</param>
         /// <param name="b">明度</param>
-        /// <returns></returns>
+        /// <returns>生成した色データ</returns>
         public static Color FromHSB(float h, float s, float b)
         {
             // h を 0.0 ～ 359.0 とする
@@ -97,5 +103,78 @@ namespace Mosaic4Atsumori
 
             return Color.FromArgb(R, G, B);
         }
+
+        /// <summary>
+        /// 色相のステップ値を取得
+        /// </summary>
+        /// <param name="c">色データ</param>
+        /// <param name="stepCount">ステップ総数</param>
+        /// <returns>ステップ値</returns>
+        public static int GetHueStep(Color c, int stepCount)
+        {
+            // ステップ値を算出
+            int step = (int)(c.GetHue() / HMAX * stepCount);
+            // ステップ値がMAXなら-1する
+            if (step == stepCount) step -= 1;
+            return step;
+        }
+
+        /// <summary>
+        /// 彩度のステップ値を取得
+        /// </summary>
+        /// <param name="c">色データ</param>
+        /// <param name="stepCount">ステップ総数</param>
+        /// <returns>ステップ値</returns>
+        public static int GetSaturationStep(Color c, int stepCount)
+        {
+            // ステップ値を算出
+            int step = (int)(c.GetSaturation() / SMAX * stepCount);
+            // ステップ値がMAXなら-1する
+            if (step == stepCount) step -= 1;
+            return step;
+        }
+
+        /// <summary>
+        /// 明度のステップ値を取得
+        /// </summary>
+        /// <param name="c">色データ</param>
+        /// <param name="stepCount">ステップ総数</param>
+        /// <returns>ステップ値</returns>
+        public static int GetBrightnessStep(Color c, int stepCount)
+        {
+            // ステップ値を算出
+            int step = (int)(c.GetBrightness() / BMAX * stepCount);
+            // ステップ値がMAXなら-1する
+            if (step == stepCount) step -= 1;
+            return step;
+        }
+
+        /// <summary>
+        /// HSB値の全ステップ値の等価チェック
+        /// </summary>
+        /// <param name="lhs">左辺値</param>
+        /// <param name="rhs">右辺値</param>
+        /// <param name="HStepCount">色相のステップ総数</param>
+        /// <param name="SStepCount">彩度のステップ総数</param>
+        /// <param name="BStepCount">明度のステップ総数</param>
+        /// <returns>等価性</returns>
+        public static bool EqualHSBSteps(Color lhs, Color rhs, int HStepCount, int SStepCount, int BStepCount)
+        {
+            return GetHueStep(lhs, HStepCount) == GetHueStep(rhs, HStepCount) &&
+                    GetSaturationStep(lhs, SStepCount) == GetSaturationStep(rhs, SStepCount) &&
+                    GetBrightnessStep(lhs, BStepCount) == GetBrightnessStep(rhs, BStepCount);
+        }
+
+        /// <summary>
+        /// 補色を返す（彩度と明度はMAX）
+        /// </summary>
+        /// <param name="c">色データ</param>
+        /// <returns>色データ</returns>
+        public static Color GetComplementaryColor(Color c)
+        {
+            return ColorUtil.FromHSB(c.GetHue() + (ColorUtil.HMAX / 2.0F), ColorUtil.SMAX, ColorUtil.BMAX);
+        }
+ 
+        #endregion
     }
 }

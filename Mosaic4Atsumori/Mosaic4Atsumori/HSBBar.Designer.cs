@@ -45,7 +45,7 @@
             this.LabelH.Name = "LabelH";
             this.LabelH.Size = new System.Drawing.Size(64, 19);
             this.LabelH.TabIndex = 0;
-            this.LabelH.Text = "いろあい";
+            this.LabelH.Text = "色相";
             this.LabelH.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // HBar
@@ -66,7 +66,7 @@
             this.LabelS.Name = "LabelS";
             this.LabelS.Size = new System.Drawing.Size(64, 19);
             this.LabelS.TabIndex = 0;
-            this.LabelS.Text = "あざやかさ";
+            this.LabelS.Text = "彩度";
             this.LabelS.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // SBar
@@ -87,7 +87,7 @@
             this.LabelB.Name = "LabelB";
             this.LabelB.Size = new System.Drawing.Size(64, 19);
             this.LabelB.TabIndex = 0;
-            this.LabelB.Text = "あかるさ";
+            this.LabelB.Text = "明度";
             this.LabelB.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // BBar

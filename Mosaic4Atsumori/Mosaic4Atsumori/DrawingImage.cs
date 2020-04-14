@@ -7,15 +7,20 @@ using System.Drawing;
 
 namespace Mosaic4Atsumori
 {
+    /// <summary>
+    /// 表示用画像生成クラス
+    /// </summary>
     class DrawingImage
     {
+        #region 定数
+
         /// <summary>
-        /// 余白(割合)
+        /// 上下左右の余白(割合)
         /// </summary>
         const double MARGIN_RATIO = 0.05;
 
         /// <summary>
-        /// テキストエリア(割合)
+        /// 行列方向のテキストエリア(割合)
         /// </summary>
         const double TEXT_AREA_RATIO = 0.15;
 
@@ -39,10 +44,14 @@ namespace Mosaic4Atsumori
         /// </summary>
         readonly Color C_HIGHLIGHT = Color.Magenta;
 
+        #endregion
+
+        #region プロパティ
+
         /// <summary>
         /// ハイライト色（外部指定可能とする）
         /// </summary>
-        public Color HighLightColor;
+        public Color HighLightColor { set; get; }
 
         /// <summary>
         /// モザイク画像生成オブジェクト
@@ -59,10 +68,14 @@ namespace Mosaic4Atsumori
         /// </summary>
         public bool IsDrawBorder { set; get; }
 
+        #endregion
+
+        #region メソッド
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="c"></param>
+        /// <param name="c">メディアンカットオブジェクト</param>
         public DrawingImage(MedianCut c)
         {
             Converter = c;
@@ -74,7 +87,8 @@ namespace Mosaic4Atsumori
         /// <summary>
         /// 表示用画像生成
         /// </summary>
-        /// <returns></returns>
+        /// <param name="imageSize">画像サイズ</param>
+        /// <returns>表示用画像</returns>
         public Bitmap Execute(Size imageSize)
         {
             // 画像を作成
@@ -86,11 +100,11 @@ namespace Mosaic4Atsumori
                 g.FillRectangle(new SolidBrush(C_BACKGROUND), 0, 0, bmp.Size.Width, bmp.Size.Height);
 
                 // モザイク画像を配置
-                for (int y = 0; y < Converter.Bitmap.Size.Height; y++)
+                for (int y = 0; y < Converter.BitmapData.Size.Height; y++)
                 {
-                    for (int x = 0; x < Converter.Bitmap.Size.Width; x++)
+                    for (int x = 0; x < Converter.BitmapData.Size.Width; x++)
                     {
-                        FillCell(g, imageSize, x, y, Converter.Bitmap.GetPixel(x, y));
+                        FillCell(g, imageSize, x, y, Converter.BitmapData.GetPixel(x, y));
                     }
                 }
 
@@ -98,16 +112,16 @@ namespace Mosaic4Atsumori
                 if (IsDrawBorder)
                 {
                     // セルの枠線
-                    for (int y = 0; y < Converter.Bitmap.Size.Height; y++)
+                    for (int y = 0; y < Converter.BitmapData.Size.Height; y++)
                     {
-                        for (int x = 0; x < Converter.Bitmap.Size.Width; x++)
+                        for (int x = 0; x < Converter.BitmapData.Size.Width; x++)
                         {
                             DrawCell(g, imageSize, x, y, C_BORDER, 1);
                         }
                     }
 
                     // セルの中心線
-                    DrawCenterLine(g, imageSize, Converter.Bitmap.Size, C_BORDER_CENTER, 2);
+                    DrawCenterLine(g, imageSize, Converter.BitmapData.Size, C_BORDER_CENTER, 2);
 
                     if (SelectedPallet >= 0 && SelectedPallet < Converter.Cubes.Count)
                     {
@@ -119,7 +133,7 @@ namespace Mosaic4Atsumori
                     }
 
                     // テキストエリアの枠線と数値
-                    for (int x = 0; x < Converter.Bitmap.Size.Width; x++)
+                    for (int x = 0; x < Converter.BitmapData.Size.Width; x++)
                     {
                         DrawTextArea(g, imageSize, x, 1, C_BORDER, 1);
 
@@ -128,7 +142,7 @@ namespace Mosaic4Atsumori
                             DrawText(g, imageSize, x, 1, Color.Black);
                         }
                     }
-                    for (int y = 0; y < Converter.Bitmap.Size.Height; y++)
+                    for (int y = 0; y < Converter.BitmapData.Size.Height; y++)
                     {
                         DrawTextArea(g, imageSize, y, 0, C_BORDER, 1);
 
@@ -146,10 +160,12 @@ namespace Mosaic4Atsumori
         /// <summary>
         /// 指定したセルの枠線を描画
         /// </summary>
-        /// <param name="g"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="c"></param>
+        /// <param name="g">グラフィックオブジェクト</param>
+        /// <param name="imageSize">画像サイズ</param>
+        /// <param name="x">セル位置X</param>
+        /// <param name="y">セル位置Y</param>
+        /// <param name="c">描画色</param>
+        /// <param name="penWidth">ペン幅</param>
         private void DrawCell(Graphics g, Size imageSize, int x, int y, Color c, int penWidth)
         {
             // セルの位置とサイズを計算
@@ -174,10 +190,11 @@ namespace Mosaic4Atsumori
         /// <summary>
         /// 指定したセルを塗り潰す
         /// </summary>
-        /// <param name="g"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="c"></param>
+        /// <param name="g">グラフィックオブジェクト</param>
+        /// <param name="imageSize">画像サイズ</param>
+        /// <param name="x">セル位置X</param>
+        /// <param name="y">セル位置Y</param>
+        /// <param name="c">描画色</param>
         private void FillCell(Graphics g, Size imageSize, int x, int y, Color c)
         {
             // セルの位置とサイズを計算
@@ -193,12 +210,12 @@ namespace Mosaic4Atsumori
         /// <summary>
         /// 指定したテキストエリアの枠線を描画
         /// </summary>
-        /// <param name="g"></param>
-        /// <param name="imageSize"></param>
-        /// <param name="xy"></param>
-        /// <param name="dir">0:X方向 1:Y方向</param>
-        /// <param name="c"></param>
-        /// <param name="penWidth"></param>
+        /// <param name="g">グラフィックオブジェクト</param>
+        /// <param name="imageSize">画像サイズ</param>
+        /// <param name="xy">セル位置(縦方向:X 横方向:Y)</param>
+        /// <param name="dir">テキストエリアの方向(縦/横)</param>
+        /// <param name="c">描画色</param>
+        /// <param name="penWidth">ペン幅</param>
         private void DrawTextArea(Graphics g, Size imageSize, int xy, int dir, Color c, int penWidth)
         {
             // テキストエリアの位置とサイズを計算
@@ -225,11 +242,11 @@ namespace Mosaic4Atsumori
         /// <summary>
         /// 指定したテキストエリアのテキストを描画
         /// </summary>
-        /// <param name="g"></param>
-        /// <param name="imageSize"></param>
-        /// <param name="xy"></param>
-        /// <param name="dir"></param>
-        /// <param name="c"></param>
+        /// <param name="g">グラフィックオブジェクト</param>
+        /// <param name="imageSize">画像サイズ</param>
+        /// <param name="xy">位置(縦方向:X 横方向:Y)</param>
+        /// <param name="dir">テキストエリアの方向(縦/横)</param>
+        /// <param name="c">描画色</param>
         private void DrawText(Graphics g, Size imageSize, int xy, int dir, Color c)
         {
             // テキストエリアの位置とサイズを計算
@@ -249,9 +266,9 @@ namespace Mosaic4Atsumori
 
                 // 選択色が連続する数を取得
                 int num = 0;
-                for (int i=0; i<Converter.Bitmap.Width; i++)
+                for (int i=0; i<Converter.BitmapData.Width; i++)
                 {
-                    Color c1 = Converter.Bitmap.GetPixel(i, xy);
+                    Color c1 = Converter.BitmapData.GetPixel(i, xy);
                     Color c2 = SelectedColor;
 
                     if (c1.R == c2.R && c1.G == c2.G && c1.B == c2.B)
@@ -287,9 +304,9 @@ namespace Mosaic4Atsumori
 
                 // 選択色が連続する数を取得
                 int num = 0;
-                for (int i = 0; i < Converter.Bitmap.Height; i++)
+                for (int i = 0; i < Converter.BitmapData.Height; i++)
                 {
-                    Color c1 = Converter.Bitmap.GetPixel(xy, i);
+                    Color c1 = Converter.BitmapData.GetPixel(xy, i);
                     Color c2 = SelectedColor;
 
                     if (c1.R == c2.R && c1.G == c2.G && c1.B == c2.B)
@@ -323,10 +340,12 @@ namespace Mosaic4Atsumori
         /// <summary>
         /// セルの中心線の描画
         /// </summary>
-        /// <param name="g"></param>
-        /// <param name="imageSize"></param>
-        /// <param name="c"></param>
-        /// <param name="penWidth"></param>
+        /// <param name="g">グラフィックオブジェクト</param>
+        /// <param name="imageSize">画像サイズ</param>
+        /// <param name="x">セル位置X</param>
+        /// <param name="y">セル位置Y</param>
+        /// <param name="c">描画色</param>
+        /// <param name="penWidth">ペン幅</param>
         private void DrawCenterLine(Graphics g, Size imageSize, Size cellSize, Color c, int penWidth)
         {
             // 中心のセル
@@ -363,13 +382,13 @@ namespace Mosaic4Atsumori
         /// <summary>
         /// セルの位置とサイズを計算
         /// </summary>
-        /// <param name="imageSize"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="px"></param>
-        /// <param name="py"></param>
-        /// <param name="pw"></param>
-        /// <param name="ph"></param>
+        /// <param name="imageSize">画像サイズ</param>
+        /// <param name="x">セル位置X</param>
+        /// <param name="y">セル位置Y</param>
+        /// <param name="px">セルの左上のX座標(pixel)</param>
+        /// <param name="py">セルの左上のY座標(pixel)</param>
+        /// <param name="pw">セルの幅(pixel)</param>
+        /// <param name="ph">セルの高さ(pixel)</param>
         private void CalcCellRect(
             Size imageSize, int x, int y,
             out int px, out int py, out int pw, out int ph)
@@ -387,12 +406,12 @@ namespace Mosaic4Atsumori
             int cellAllH = imageSize.Height - (marginH * 2) - textAreaH;
 
             // セルのサイズを計算
-            int cellW = cellAllW / Converter.Bitmap.Size.Width;
-            int cellH = cellAllH / Converter.Bitmap.Size.Height;
+            int cellW = cellAllW / Converter.BitmapData.Size.Width;
+            int cellH = cellAllH / Converter.BitmapData.Size.Height;
 
             // 余りを計算（より左側,上側のセルに余りを+1ずつ加える）
-            int remainX = cellAllW - Converter.Bitmap.Size.Width * cellW;
-            int remainY = cellAllH - Converter.Bitmap.Size.Height * cellH;
+            int remainX = cellAllW - Converter.BitmapData.Size.Width * cellW;
+            int remainY = cellAllH - Converter.BitmapData.Size.Height * cellH;
 
             // 座標 = 余白 + テキストエリア + そのセルの左端,上端の位置 + そのセルまでに含まれる余り
             px = marginW + textAreaW + (cellW * x) + Math.Min(x, remainX);
@@ -405,15 +424,14 @@ namespace Mosaic4Atsumori
 
         /// <summary>
         /// テキストエリアの位置とサイズを計算
-        /// xまたはyに0を指定すると、その方向のサイズ計算となる
         /// </summary>
-        /// <param name="imageSize"></param>
-        /// <param name="xy"></param>
-        /// <param name="dir">0:X方向 1:Y方向</param>
-        /// <param name="px"></param>
-        /// <param name="py"></param>
-        /// <param name="pw"></param>
-        /// <param name="ph"></param>
+        /// <param name="imageSize">画像サイズ</param>
+        /// <param name="xy">位置(縦方向:X 横方向:Y)</param>
+        /// <param name="dir">テキストエリアの方向(縦/横)</param>
+        /// <param name="px">テキストエリアの左上のX座標(pixel)</param>
+        /// <param name="py">テキストエリアの左上のY座標(pixel)</param>
+        /// <param name="pw">テキストエリアの幅(pixel)</param>
+        /// <param name="ph">テキストエリアの高さ(pixel)</param>
         private void CalcTextAreaRect(Size imageSize, int xy, int dir,
             out int px, out int py, out int pw, out int ph)
         {
@@ -455,5 +473,7 @@ namespace Mosaic4Atsumori
                 ph = textAreaH;
             }
         }
+
+        #endregion
     }
 }
