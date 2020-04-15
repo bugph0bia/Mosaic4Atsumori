@@ -1,7 +1,8 @@
 Mosaic4Atsumori
 ===
 
-![Software Version](http://img.shields.io/badge/Version-v0.0.1-green.svg?style=flat)
+![Software Version](http://img.shields.io/badge/Version-v0.0.2-green.svg?style=flat)
+![.NET Framework](http://img.shields.io/badge/.NET_Framework-v4.6.1-blue.svg?style=flat)
 ![VS Version](http://img.shields.io/badge/VisualStudio-2017-blue.svg?style=flat)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
@@ -24,10 +25,14 @@ Mosaic4Atsumori
 - QRコード作成。
 
 ## バージョン
-v0.0.1
+v0.0.2
 
 ## ダウンロード
 [こちら](https://github.com/mat2umoto/Mosaic4Atsumori/releases/download/v0.0.1/Mosaic4Atsumori.zip) から V0.0.1 をダウンロードできます。
+
+## 動作要件
+- Windows
+- .NET Framework V4.6.1 以降
 
 ## 開発環境
 Visual Studio 2017
