@@ -28,7 +28,7 @@ Mosaic4Atsumori
 v0.0.2
 
 ## ダウンロード
-[こちら](https://github.com/mat2umoto/Mosaic4Atsumori/releases/download/v0.0.1/Mosaic4Atsumori.zip) から V0.0.1 をダウンロードできます。
+[こちら](https://github.com/mat2umoto/Mosaic4Atsumori/releases/download/v0.0.2/Mosaic4Atsumori.zip) から V0.0.2 をダウンロードできます。
 
 ## 動作要件
 - Windows
