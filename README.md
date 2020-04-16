@@ -6,6 +6,8 @@ Mosaic4Atsumori
 ![VS Version](http://img.shields.io/badge/VisualStudio-2017-blue.svg?style=flat)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
+[English Page](./README.en.md)
+
 ## 概要
 あつ森（あつまれ どうぶつの森）のマイデザイン作成を補助するツールです。  
 ※Windows専用です。
@@ -28,7 +30,7 @@ Mosaic4Atsumori
 v0.0.2
 
 ## ダウンロード
-[こちら](https://github.com/mat2umoto/Mosaic4Atsumori/releases/download/v0.0.2/Mosaic4Atsumori.zip) から V0.0.2 をダウンロードできます。
+[こちら](./releases/download/v0.0.2/Mosaic4Atsumori.zip) から V0.0.2 をダウンロードできます。
 
 ## 動作要件
 - Windows
@@ -55,9 +57,9 @@ MIT License
 
 ### パレットについて
 
-![pallet](https://user-images.githubusercontent.com/18702413/79063581-889f9d80-7cdd-11ea-8308-fad304efcc6a.png)
+![palette](https://user-images.githubusercontent.com/18702413/79063581-889f9d80-7cdd-11ea-8308-fad304efcc6a.png)
 
-- 画像表示エリアの上部に最大 15 色のパレットが表示され、画像内で使用される最大 15 色の色を確認できます。  
+- 画像表示エリアの上部に最大 15 色のパレットが表示され、画像内で使用される色を確認できます。  
 - パレットは画像内で使用されている場所が多い順に並びます。  
 - パレットのどれかをクリックすると、右側にその色の「いろあい」「あざやかさ」「あかるさ」が表示されるので、色の作成に利用できます。  
 - 画像の中でクリックされた色を使用してる場所がハイライト表示され、その色が使われている数が各行／各列に表示されるので、画像作成時のヒントとして利用できます。  
