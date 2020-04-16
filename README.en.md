@@ -31,7 +31,7 @@ This is for Windows only.
 v0.0.2
 
 ## Download
-You can download v0.0.2 [here](./releases/download/v0.0.2/Mosaic4Atsumori.zip) .
+You can download v0.0.2 [here](https://github.com/mat2umoto/Mosaic4Atsumori/releases/download/v0.0.2/Mosaic4Atsumori.zip) .
 
 ## Requirements
 - Windows OS
