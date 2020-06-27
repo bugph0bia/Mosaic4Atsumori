@@ -30,9 +30,6 @@ This is for Windows only.
 ## Version
 v0.0.2
 
-## Download
-You can download v0.0.2 [here](https://github.com/mat2umoto/Mosaic4Atsumori/releases/download/v0.0.2/Mosaic4Atsumori.zip) .
-
 ## Requirements
 - Windows OS
 - NET Framework V4.6.1 or later
