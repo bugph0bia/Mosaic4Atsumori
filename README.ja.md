@@ -6,7 +6,7 @@ Mosaic4Atsumori
 ![VS Version](http://img.shields.io/badge/VisualStudio-2017-blue.svg?style=flat)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
-[English Page](./README.en.md)
+[English Page](./README.md)
 
 ## 概要
 あつ森（あつまれ どうぶつの森）のマイデザイン作成を補助するツールです。  

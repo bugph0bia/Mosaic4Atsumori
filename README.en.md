@@ -6,10 +6,10 @@ Mosaic4Atsumori
 ![VS Version](http://img.shields.io/badge/VisualStudio-2017-blue.svg?style=flat)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
-[Japanese Page](./README.md)
+[Japanese Page](./README.ja.md)
 
 ## Overview
-A tool to help you create your My Design for "Animal Crossing: New Horizons".
+This tool to help you create your Custom Designs in "Animal Crossing: New Horizons".
   
 This is for Windows only.
 
